@@ -1,0 +1,38 @@
+---
+# tasks file for dependencies
+    -
+      name: configure firewall for Apache and database
+      command: "{{item}}"
+      with_items:
+        - firewall-cmd --permanent --zone=public --add-port=80/tcp
+        - firewall-cmd --permanent --zone=public --add-service=http
+        - firewall-cmd --permanent --zone=public --add-port=3306/tcp
+        - firewall-cmd --permanent --zone=public --add-port=5000/tcp
+        - firewall-cmd --reload
+
+    -
+      name: Install httpd
+      yum:
+        name: httpd
+        state: present
+    -
+      name: start service
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+    -
+      name: 'Install all required dependencies'
+      yum:
+        name: '{{item}}'
+        state: present
+      loop:
+        - python3
+        - python3-pip
+        - python3-devel
+        - git
+    -
+      name: 'Installing pymysql dependcy'
+      pip:
+        name: pymysql
+        state: present
